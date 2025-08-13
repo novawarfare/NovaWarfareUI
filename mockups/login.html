@@ -1,0 +1,108 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Определения градиентов и эффектов -->
+  <defs>
+    <!-- Градиент в стиле HUD для фона -->
+    <linearGradient id="hudBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#001a00" />
+      <stop offset="100%" stop-color="#003300" />
+    </linearGradient>
+    
+    <!-- Свечение для HUD элементов -->
+    <filter id="hudGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    
+    <!-- Градиент для кнопки -->
+    <linearGradient id="hudButton" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00cc00" />
+      <stop offset="100%" stop-color="#99ff99" />
+    </linearGradient>
+    
+    <!-- Точечный паттерн для фона -->
+    <pattern id="hudPattern" width="10" height="10" patternUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="0.5" fill="#00cc00" opacity="0.1" />
+    </pattern>
+  </defs>
+  
+  <!-- Основной фон -->
+  <rect width="800" height="600" fill="url(#hudBg)" />
+  <rect width="800" height="600" fill="url(#hudPattern)" />
+  
+  <!-- Технические линии и сетка HUD -->
+  <g opacity="0.2">
+    <circle cx="400" cy="300" r="250" fill="none" stroke="#00cc00" stroke-width="1" />
+    <circle cx="400" cy="300" r="200" fill="none" stroke="#00cc00" stroke-width="1" />
+    <circle cx="400" cy="300" r="150" fill="none" stroke="#00cc00" stroke-width="1" />
+    
+    <!-- Перекрестья и метки -->
+    <line x1="0" y1="300" x2="800" y2="300" stroke="#00cc00" stroke-width="0.5" />
+    <line x1="400" y1="0" x2="400" y2="600" stroke="#00cc00" stroke-width="0.5" />
+    
+    <!-- Угловые маркеры -->
+    <path d="M 50 50 L 100 50 L 100 100" fill="none" stroke="#00cc00" stroke-width="1" />
+    <path d="M 750 50 L 700 50 L 700 100" fill="none" stroke="#00cc00" stroke-width="1" />
+    <path d="M 50 550 L 100 550 L 100 500" fill="none" stroke="#00cc00" stroke-width="1" />
+    <path d="M 750 550 L 700 550 L 700 500" fill="none" stroke="#00cc00" stroke-width="1" />
+  </g>
+  
+  <!-- Верхняя панель навигации -->
+  <rect x="0" y="0" width="800" height="70" fill="rgba(0, 51, 0, 0.8)" />
+  <text x="30" y="45" font-family="Arial" font-size="24" fill="#ffffff" font-weight="bold">NOVA<tspan fill="#00cc00">WARFARE</tspan></text>
+  
+  <!-- HUD-индикаторы на панели -->
+  <text x="600" y="25" font-family="Courier New" font-size="12" fill="#00cc00">STATUS: SECURE</text>
+  <text x="600" y="45" font-family="Courier New" font-size="12" fill="#00cc00">UPLINK: ACTIVE</text>
+  <text x="600" y="65" font-family="Courier New" font-size="12" fill="#00cc00">ENCRYPTING...</text>
+  
+  <!-- Форма входа в стиле военного HUD -->
+  <g>
+    <rect x="250" y="150" width="300" height="350" rx="0" fill="rgba(0, 25, 0, 0.7)" stroke="#00cc00" stroke-width="1.5" />
+    
+    <!-- Технические индикаторы и маркеры -->
+    <path d="M 250 150 L 270 150 M 250 150 L 250 170" fill="none" stroke="#00cc00" stroke-width="2" />
+    <path d="M 550 150 L 530 150 M 550 150 L 550 170" fill="none" stroke="#00cc00" stroke-width="2" />
+    <path d="M 250 500 L 270 500 M 250 500 L 250 480" fill="none" stroke="#00cc00" stroke-width="2" />
+    <path d="M 550 500 L 530 500 M 550 500 L 550 480" fill="none" stroke="#00cc00" stroke-width="2" />
+    
+    <!-- Сканирующие линии HUD -->
+    <rect x="270" y="180" width="260" height="1" fill="#00cc00" opacity="0.7">
+      <animate attributeName="y" from="180" to="480" dur="10s" repeatCount="indefinite" />
+    </rect>
+  </g>
+  
+  <!-- Заголовок формы в стиле военного интерфейса -->
+  <text x="400" y="180" font-family="Courier New" font-size="20" fill="#ffffff" font-weight="bold" text-anchor="middle" letter-spacing="1">// SYSTEM ACCESS //</text>
+  
+  <!-- Системная информация -->
+  <text x="270" y="210" font-family="Courier New" font-size="10" fill="#00cc00">INITIALIZING SECURE CONNECTION...</text>
+  
+  <!-- Поля ввода с технологичным дизайном -->
+  <rect x="280" y="220" width="240" height="45" rx="0" fill="rgba(0, 25, 0, 0.5)" stroke="#00cc00" stroke-width="1" />
+  <text x="290" y="245" font-family="Courier New" font-size="14" fill="#00cc00">PERSONNEL ID:</text>
+  <text x="520" y="245" font-family="Courier New" font-size="14" fill="#00cc00" text-anchor="end">_</text>
+  
+  <rect x="280" y="290" width="240" height="45" rx="0" fill="rgba(0, 25, 0, 0.5)" stroke="#00cc00" stroke-width="1" />
+  <text x="290" y="315" font-family="Courier New" font-size="14" fill="#00cc00">SECURITY CODE:</text>
+  <text x="520" y="315" font-family="Courier New" font-size="14" fill="#00cc00" text-anchor="end">********</text>
+  
+  <!-- Индикаторы состояния полей -->
+  <text x="290" y="275" font-family="Courier New" font-size="10" fill="#00cc00">STATUS: AWAITING INPUT</text>
+  <text x="290" y="345" font-family="Courier New" font-size="10" fill="#00cc00">ENCRYPTION: LEVEL 4</text>
+  
+  <!-- Кнопка входа -->
+  <rect x="280" y="360" width="240" height="45" rx="0" fill="none" stroke="#00cc00" stroke-width="2" />
+  <rect x="282" y="362" width="236" height="41" rx="0" fill="url(#hudButton)" opacity="0.3" />
+  <text x="400" y="388" font-family="Courier New" font-size="18" fill="#ffffff" font-weight="bold" text-anchor="middle">AUTHORIZE</text>
+  
+  <!-- Техническая информация внизу формы -->
+  <text x="400" y="430" font-family="Courier New" font-size="12" fill="#00cc00" text-anchor="middle">NEW CLEARANCE REQUEST</text>
+  <text x="400" y="460" font-family="Courier New" font-size="12" fill="#00cc00" text-anchor="middle">CODE RESET PROTOCOL</text>
+  
+  <!-- Системные линии данных -->
+  <line x1="250" y1="480" x2="550" y2="480" stroke="#00cc00" stroke-width="1" stroke-dasharray="5,5" />
+  
+  <!-- Нижняя информационная панель -->
+  <rect x="0" y="560" width="800" height="40" fill="rgba(0, 51, 0, 0.8)" />
+  <text x="400" y="585" font-family="Courier New" font-size="12" fill="#00cc00" text-anchor="middle">© 2025 NOVAWARFARE • TACTICAL INTERFACE v4.2.7 • MIL-SPEC SECURITY</text>
+</svg>

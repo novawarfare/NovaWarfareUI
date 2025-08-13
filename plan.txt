@@ -1,0 +1,457 @@
+cd C:\Users\shyi2\source\repos\NovaWarfare\front-end\novawarfare-frontend
+
+Email: admin@novawarfare.com
+Пароль: admin
+
+План для Cursor AI: Разработка фронтенда проекта NovaWarfare
+1. Настройка проекта React
+
+Инициализировать React-приложение:
+
+bashnpx create-react-app novawarfare-frontend
+cd novawarfare-frontend
+
+Установить необходимые зависимости:
+
+bashnpm install axios react-router-dom styled-components jwt-decode
+2. Создать структуру папок проекта
+bashmkdir -p src/assets
+mkdir -p src/components/auth src/components/common src/components/hud src/components/missions src/components/cart
+mkdir -p src/context
+mkdir -p src/hooks
+mkdir -p src/pages
+mkdir -p src/services
+mkdir -p src/styles
+mkdir -p src/utils
+3. Настроить взаимодействие с API
+Создать файл src/services/api.js для базовой конфигурации API:
+jsximport axios from 'axios';
+
+const API_BASE_URL = 'http://localhost:5000/api'; // URL бэкенда
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Добавление JWT токена к запросам
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export default api;
+Создать файл src/services/authService.js для работы с авторизацией:
+jsximport api from './api';
+
+export const authService = {
+  login: (credentials) => api.post('/auth/login', credentials),
+  register: (userData) => api.post('/auth/register', userData),
+  refreshToken: (token) => api.post('/auth/refresh-token', { token }),
+  getCurrentUser: () => api.get('/auth/me'),
+};
+Создать файл src/services/missionService.js для работы с миссиями:
+jsximport api from './api';
+
+export const missionService = {
+  getAllMissions: (params) => api.get('/products', { params }),
+  getMissionById: (id) => api.get(`/products/${id}`),
+  getRelatedMissions: (id) => api.get(`/products/${id}/related`),
+  getPopularMissions: () => api.get('/products/popular'),
+};
+Создать файл src/services/cartService.js для работы с корзиной:
+jsximport api from './api';
+
+export const cartService = {
+  getCart: () => api.get('/orders/cart'),
+  addToCart: (productId, quantity) => api.post('/orders/cart', { productId, quantity }),
+  updateCartItem: (productId, quantity) => api.put('/orders/cart', { productId, quantity }),
+  removeFromCart: (productId) => api.delete(`/orders/cart/${productId}`),
+  checkout: (paymentData) => api.post('/orders/checkout', paymentData),
+};
+4. Создать основные компоненты HUD-стиля
+Создать файл src/styles/GlobalStyles.js:
+jsximport { createGlobalStyle } from 'styled-components';
+
+export const GlobalStyles = createGlobalStyle`
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: 'Courier New', monospace;
+    color: #ffffff;
+    background-color: #001a00;
+    line-height: 1.5;
+  }
+  
+  a {
+    color: #00cc00;
+    text-decoration: none;
+  }
+  
+  button {
+    font-family: 'Courier New', monospace;
+    background: transparent;
+    color: #ffffff;
+    border: 2px solid #00cc00;
+    cursor: pointer;
+  }
+`;
+Создать базовые HUD-компоненты в папке src/components/hud:
+
+HudBackground.js - фон с градиентом и точечным паттерном
+HudFrame.js - рамка с угловыми маркерами
+HudButton.js - кнопка в стиле HUD
+HudHeader.js - верхняя панель навигации
+HudFooter.js - нижняя информационная панель
+ScanLine.js - анимированная линия сканирования
+
+5. Создать компоненты авторизации
+Создать компоненты в папке src/components/auth:
+
+LoginForm.js - форма входа в стиле HUD
+RegisterForm.js - форма регистрации
+
+6. Создать контекст авторизации
+Создать файл src/context/AuthContext.js:
+jsximport React, { createContext, useState, useEffect } from 'react';
+import { authService } from '../services/authService';
+import jwt_decode from 'jwt-decode';
+
+export const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Проверка токена при загрузке
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decoded = jwt_decode(token);
+        const currentTime = Date.now() / 1000;
+        
+        if (decoded.exp < currentTime) {
+          // Токен истек - пытаемся обновить
+          refreshToken();
+        } else {
+          // Токен действителен - получаем данные пользователя
+          loadUser();
+        }
+      } catch (err) {
+        console.error('Invalid token', err);
+        localStorage.removeItem('token');
+        setLoading(false);
+      }
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
+  const loadUser = async () => {
+    try {
+      const response = await authService.getCurrentUser();
+      setCurrentUser(response.data);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to load user');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const refreshToken = async () => {
+    try {
+      const refreshToken = localStorage.getItem('refreshToken');
+      if (!refreshToken) {
+        throw new Error('No refresh token available');
+      }
+      
+      const response = await authService.refreshToken(refreshToken);
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('refreshToken', response.data.refreshToken);
+      
+      loadUser();
+    } catch (err) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
+      setError(err.response?.data?.message || 'Failed to refresh token');
+      setLoading(false);
+    }
+  };
+
+  const login = async (credentials) => {
+    try {
+      const response = await authService.login(credentials);
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('refreshToken', response.data.refreshToken);
+      setCurrentUser(response.data.user);
+      return response.data;
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed');
+      throw err;
+    }
+  };
+
+  const register = async (userData) => {
+    try {
+      const response = await authService.register(userData);
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('refreshToken', response.data.refreshToken);
+      setCurrentUser(response.data.user);
+      return response.data;
+    } catch (err) {
+      setError(err.response?.data?.message || 'Registration failed');
+      throw err;
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    setCurrentUser(null);
+  };
+
+  return (
+    <AuthContext.Provider value={{ 
+      currentUser, 
+      loading, 
+      error,
+      login,
+      register,
+      logout
+    }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+7. Создать контекст корзины
+Создать файл src/context/CartContext.js:
+jsximport React, { createContext, useState, useEffect, useContext } from 'react';
+import { cartService } from '../services/cartService';
+import { AuthContext } from './AuthContext';
+
+export const CartContext = createContext();
+
+export const CartProvider = ({ children }) => {
+  const [cart, setCart] = useState({ items: [], totalAmount: 0 });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const { currentUser } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (currentUser) {
+      fetchCart();
+    } else {
+      // Если пользователь не авторизован, загружаем корзину из localStorage
+      const localCart = localStorage.getItem('cart');
+      if (localCart) {
+        setCart(JSON.parse(localCart));
+      }
+    }
+  }, [currentUser]);
+
+  const fetchCart = async () => {
+    try {
+      setLoading(true);
+      const response = await cartService.getCart();
+      setCart(response.data);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch cart');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addToCart = async (productId, quantity = 1) => {
+    try {
+      setLoading(true);
+      if (currentUser) {
+        // Если пользователь авторизован, используем API
+        await cartService.addToCart(productId, quantity);
+        fetchCart();
+      } else {
+        // Иначе сохраняем в localStorage
+        const updatedCart = { ...cart };
+        const existingItem = updatedCart.items.find(item => item.productId === productId);
+        
+        if (existingItem) {
+          existingItem.quantity += quantity;
+        } else {
+          updatedCart.items.push({ productId, quantity });
+        }
+        
+        // Обновить общую сумму (в реальном приложении нужно получить цену продукта)
+        localStorage.setItem('cart', JSON.stringify(updatedCart));
+        setCart(updatedCart);
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to add item to cart');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const removeFromCart = async (productId) => {
+    try {
+      setLoading(true);
+      if (currentUser) {
+        await cartService.removeFromCart(productId);
+        fetchCart();
+      } else {
+        const updatedCart = { 
+          ...cart,
+          items: cart.items.filter(item => item.productId !== productId)
+        };
+        localStorage.setItem('cart', JSON.stringify(updatedCart));
+        setCart(updatedCart);
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to remove item from cart');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const checkout = async (paymentData) => {
+    try {
+      setLoading(true);
+      const response = await cartService.checkout(paymentData);
+      setCart({ items: [], totalAmount: 0 });
+      return response.data;
+    } catch (err) {
+      setError(err.response?.data?.message || 'Checkout failed');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <CartContext.Provider value={{ 
+      cart,
+      loading,
+      error,
+      addToCart,
+      removeFromCart,
+      checkout
+    }}>
+      {children}
+    </CartContext.Provider>
+  );
+};
+8. Создать основные страницы приложения
+Необходимо создать следующие страницы:
+
+src/pages/LoginPage.js - страница входа
+src/pages/RegisterPage.js - страница регистрации
+src/pages/HomePage.js - главная страница
+src/pages/MissionsPage.js - каталог миссий
+src/pages/MissionDetailPage.js - детальная страница миссии
+src/pages/CartPage.js - страница корзины
+src/pages/CheckoutPage.js - страница оформления заказа
+
+9. Настроить маршрутизацию
+Создать файл src/App.js:
+jsximport React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { GlobalStyles } from './styles/GlobalStyles';
+import { AuthProvider } from './context/AuthContext';
+import { CartProvider } from './context/CartContext';
+
+// Pages
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import HomePage from './pages/HomePage';
+import MissionsPage from './pages/MissionsPage';
+import MissionDetailPage from './pages/MissionDetailPage';
+import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/CheckoutPage';
+
+// Components
+import PrivateRoute from './components/common/PrivateRoute';
+import HudHeader from './components/hud/HudHeader';
+import HudFooter from './components/hud/HudFooter';
+
+function App() {
+  return (
+    <Router>
+      <AuthProvider>
+        <CartProvider>
+          <GlobalStyles />
+          <HudHeader />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/missions" element={<MissionsPage />} />
+            <Route path="/missions/:id" element={<MissionDetailPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/checkout" element={<PrivateRoute><CheckoutPage /></PrivateRoute>} />
+          </Routes>
+          <HudFooter />
+        </CartProvider>
+      </AuthProvider>
+    </Router>
+  );
+}
+
+export default App;
+10. Разработать компоненты для основных страниц
+Для каждой страницы необходимо разработать соответствующие компоненты в соответствии с мокапами в стиле военного HUD-интерфейса. Каждая страница должна делать соответствующие запросы к API через созданные сервисы.
+Рекомендации для Cursor AI
+
+Сначала создайте базовые компоненты HUD-стиля, они будут использоваться на всех страницах
+Следуйте макетам для создания интерфейса, используя стилизованные компоненты
+Обязательно реализуйте анимации (сканирующие линии, мигающие элементы) для военного HUD-эффекта
+При работе с API используйте функции из созданных сервисов
+Для авторизации обязательно реализуйте отправку JWT-токена и его обновление
+Для поддержания единого стиля используйте созданные HUD-компоненты везде, где это возможно
+Реализуйте корректную обработку ошибок с API и отображение их пользователю
+Обязательно реализуйте страницы в соответствии с мокапами и предоставленным стилем
+
+
+Отвечу на ваши вопросы:
+
+Я рекомендую создать React-приложение с нуля, это даст нам больше контроля над структурой проекта и зависимостями. Готовые шаблоны часто содержат избыточные компоненты и библиотеки, которые могут не понадобиться для нашего специфического HUD-стиля.
+В первую очередь стоит реализовать базовые HUD-компоненты, так как они будут использоваться на всех страницах:
+
+HudBackground (фон с градиентом и точечным паттерном)
+HudFrame (рамки с угловыми маркерами)
+ScanLine (анимированная линия сканирования)
+HudButton (стилизованные кнопки)
+
+После этого лучше сразу перейти к компонентам авторизации (LoginPage и RegisterPage), чтобы можно было начать тестировать взаимодействие с бэкендом.
+TypeScript определенно стоит использовать вместо JavaScript. Это даст нам:
+
+Типизацию данных при взаимодействии с API
+Более строгую проверку свойств компонентов
+Лучшую поддержку IDE (автодополнение, подсказки)
+Меньше ошибок во время выполнения
+
+
+Дополнительные требования к стилизации, которые стоит учесть:
+
+Адаптивный дизайн: HUD-интерфейс должен корректно масштабироваться на разных экранах
+Анимации: реализовать не только сканирующие линии, но и мигающие индикаторы, плавные переходы
+Звуковые эффекты: можно добавить тихие звуки при навигации или клике для погружения
+Тёмный режим уже заложен в дизайне, дополнительно можно предусмотреть высококонтрастный режим для доступности
+
+
+Наиболее важные функции API-взаимодействия на текущем этапе:
+
+Авторизация (регистрация, вход, обновление токена)
+Получение списка миссий с возможностью фильтрации
+Детали конкретной миссии
+Добавление миссий в корзину
+
+Важно реализовать корректную обработку ошибок API и отображение их пользователю в HUD-стиле (например, как системные предупреждения).
