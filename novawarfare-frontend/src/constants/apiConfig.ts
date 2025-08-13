@@ -1,2 +1,4 @@
 // Базовые URL для API
-export const API_BASE_URL = 'https://localhost:7261/api'; 
+import { API_URL } from './api';
+
+export const API_BASE_URL = `${API_URL}/api`; 
