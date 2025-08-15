@@ -67,6 +67,7 @@ class ApiClient {
                   console.log('🔄 Trying to refresh token...');
                   console.log('Old token exp:', JSON.parse(atob(oldToken.split('.')[1])).exp);
                   console.log('Refresh token:', oldRefreshToken.substring(0, 20) + '...');
+                  console.log('Current time:', Date.now());
                   
                   const response = await refreshToken(oldToken, oldRefreshToken);
                   
