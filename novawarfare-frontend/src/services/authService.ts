@@ -216,7 +216,15 @@ export const validateToken = async (): Promise<boolean> => {
     const payload = JSON.parse(atob(parts[1]));
     const currentTimeUTC = Math.floor(Date.now() / 1000); // UTC timestamp в секундах
     
+    // DEBUG: Логируем времена для отладки
+    console.log('🔍 Token validation:');
+    console.log('Token exp:', payload.exp, '(' + new Date(payload.exp * 1000) + ')');
+    console.log('Current UTC:', currentTimeUTC, '(' + new Date(currentTimeUTC * 1000) + ')');
+    console.log('Time diff (seconds):', payload.exp - currentTimeUTC);
+    console.log('Token valid:', payload.exp > currentTimeUTC);
+    
     if (payload.exp && payload.exp < currentTimeUTC) {
+      console.log('❌ Token expired!');
       return false;
     }
     
