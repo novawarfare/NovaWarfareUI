@@ -305,9 +305,22 @@ class UserService {
     }
   ): Promise<Player> {
     try {
+      console.log('🔄 Updating player profile...');
+      console.log('User ID:', userId);
+      console.log('Profile data:', profileData);
+      console.log('API URL:', `${this.baseUrl}/${userId}`);
+      console.log('Current time:', Date.now());
+
+
+      
+      
       const response = await apiClient.put<Player>(`${this.baseUrl}/${userId}`, profileData);
+      
+      console.log('✅ Profile updated successfully!');
+      console.log('Response:', response);
       return response;
     } catch (error) {
+      console.log('❌ Profile update failed:', error);
       throw error;
     }
   }
