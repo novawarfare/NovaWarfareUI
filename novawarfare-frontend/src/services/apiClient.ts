@@ -64,8 +64,13 @@ class ApiClient {
               if (oldToken && oldRefreshToken) {
                 // Обновляем токен
                 try {
+                  console.log('🔄 Trying to refresh token...');
+                  console.log('Old token exp:', JSON.parse(atob(oldToken.split('.')[1])).exp);
+                  console.log('Refresh token:', oldRefreshToken.substring(0, 20) + '...');
+                  
                   const response = await refreshToken(oldToken, oldRefreshToken);
                   
+                  console.log('✅ Token refreshed successfully!');
                   // Сохраняем новые токены
                   saveAuthData(response);
                   
