@@ -212,11 +212,11 @@ export const validateToken = async (): Promise<boolean> => {
       return false;
     }
     
-    // Проверяем срок действия токена
+    // Проверяем срок действия токена используя JWT exp поле с UTC временем
     const payload = JSON.parse(atob(parts[1]));
-    const currentTime = Math.floor(Date.now() / 1000);
+    const currentTimeUTC = Math.floor(Date.now() / 1000); // UTC timestamp в секундах
     
-    if (payload.exp && payload.exp < currentTime) {
+    if (payload.exp && payload.exp < currentTimeUTC) {
       return false;
     }
     
