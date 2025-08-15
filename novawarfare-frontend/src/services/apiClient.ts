@@ -34,10 +34,12 @@ class ApiClient {
     axios.interceptors.request.use(
       (config: InternalAxiosRequestConfig) => {
         const { token } = getAuthData();
+        console.log('Token from getAuthData:', token ? 'EXISTS' : 'NULL/UNDEFINED');
         if (token) {
           config.headers = config.headers || {};
           config.headers.Authorization = `Bearer ${token}`;
         }
+        console.log('Authorization header:', config.headers?.Authorization);
         return config;
       },
       (error: AxiosError) => Promise.reject(error)
@@ -64,14 +66,9 @@ class ApiClient {
               if (oldToken && oldRefreshToken) {
                 // Обновляем токен
                 try {
-                  console.log('🔄 Trying to refresh token...');
-                  console.log('Old token exp:', JSON.parse(atob(oldToken.split('.')[1])).exp);
-                  console.log('Refresh token:', oldRefreshToken.substring(0, 20) + '...');
-                  console.log('Current time:', Date.now());
+
                   
                   const response = await refreshToken(oldToken, oldRefreshToken);
-                  
-                  console.log('✅ Token refreshed successfully!');
                   // Сохраняем новые токены
                   saveAuthData(response);
                   
@@ -86,7 +83,6 @@ class ApiClient {
                   // Повторяем оригинальный запрос с новым токеном
                   return axios(originalRequest);
                 } catch (refreshError) {
-                  console.error('Не удалось обновить токен:', refreshError);
                   performLogout();
                   return Promise.reject(error);
                 }
