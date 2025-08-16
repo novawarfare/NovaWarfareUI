@@ -107,15 +107,15 @@ const InputField = styled.input`
 `;
 
 const StatusText = styled.div`
-  color: #66ff66;
-  font-size: 9px;
+  color: #00d4ff;
+  font-size: 12px;
   margin-bottom: 5px;
   letter-spacing: 1px;
 `;
 
 const EncryptionText = styled.div`
-  color: #66ff66;
-  font-size: 9px;
+  color: #00d4ff;
+  font-size: 12px;
   margin-bottom: 5px;
   letter-spacing: 1px;
 `;
@@ -409,17 +409,17 @@ const RegisterPage: React.FC = () => {
           </circle>
           
           <line x1="0" y1="300" x2="800" y2="300" stroke="#66ff66" strokeWidth="1" opacity="0.3">
-            <animate attributeName="y1" from="0" to="600" dur="3s" repeatCount="indefinite"/>
-            <animate attributeName="y2" from="0" to="600" dur="3s" repeatCount="indefinite"/>
+            <animate attributeName="y1" from="0" to="600" dur="3.8s" repeatCount="indefinite"/>
+            <animate attributeName="y2" from="0" to="600" dur="3.8s" repeatCount="indefinite"/>
           </line>
           <line x1="400" y1="0" x2="400" y2="600" stroke="#66ff66" strokeWidth="1" opacity="0.3">
-            <animate attributeName="x1" from="0" to="800" dur="4s" repeatCount="indefinite"/>
-            <animate attributeName="x2" from="0" to="800" dur="4s" repeatCount="indefinite"/>
+            <animate attributeName="x1" from="0" to="800" dur="4.9s" repeatCount="indefinite"/>
+            <animate attributeName="x2" from="0" to="800" dur="4.9s" repeatCount="indefinite"/>
           </line>
           
           <circle cx="400" cy="300" r="5" fill="url(#scanline)">
-            <animate attributeName="r" values="5;50;5" dur="2s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="r" values="5;50;5" dur="2.7s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2.7s" repeatCount="indefinite"/>
           </circle>
         </g>
       </HudGrid>
@@ -465,7 +465,7 @@ const RegisterPage: React.FC = () => {
                 placeholder=""
                 maxLength={17}
               />
-              <StatusText>FORMAT: (555) 123-4567 OR +1 555 123 4567</StatusText>
+              <StatusText>FORMAT: (555) 123-4567</StatusText>
             </InputBlock>
 
             <InputBlock>
