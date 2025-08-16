@@ -451,7 +451,7 @@ const RegisterPage: React.FC = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
-              <StatusText>FORMAT: CLASSIFIED@DOMAIN</StatusText>
+              <StatusText>FORMAT:CLASSIFIED@DOMAIN.COM</StatusText>
             </InputBlock>
 
             <InputBlock>
